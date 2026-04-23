@@ -14,23 +14,14 @@ build_format = '| {:25} | {:35} | {:18} | {:6} |'
 build_separator = '-' * 88
 
 default_boards = [
-    'cluenrf52840',
-    'cplaynrf52840',
-    'feather52832',
-    'feather52840',
-    'feather52840sense',
-    'itsybitsy52840'
+    'nicenanov2',
+    'nrfmicro',
+    'supermini'
 ]
 build_boards = []
 
 def get_sd(name):
-    if '52832' in name:
-        return 's132v6'
-    elif '52833' in name or name == 'pca10100':
-        return 's140v7'
-    else:
-        # most of the board is 52840
-        return 's140v6'
+    return 's140v6'
 
 def build_a_example(arg):
     variant = arg[0]
