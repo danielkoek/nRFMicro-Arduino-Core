@@ -23,36 +23,45 @@ There are two methods that you can use to install this BSP. We highly recommend 
 
 ### Recommended: BSP via the Arduino Board Manager
 
- 1. [Download and install the Arduino IDE](https://www.arduino.cc/en/Main/Software) (At least v1.6.12)
- 2. Start the Arduino IDE
- 3. Go into Preferences
- 4. Add "https://raw.githubusercontent.com/pdcook/nRFMicro-Arduino-Core/main/package_nRFMicro_index.json" as an 'Additional Board Manager URL'
- 5. Restart the Arduino IDE
- 6. Open the Boards Manager from the Tools -> Board menu and install 'nRFMicro Boards'
- 7. Once the BSP is installed, select 'nRFMicro' or 'SuperMini nRF52840' from the Tools -> Board menu, which will update your system config to use the right compiler and settings for the nRF52.
+1.  [Download and install the Arduino IDE](https://www.arduino.cc/en/Main/Software) (At least v1.6.12)
+2.  Start the Arduino IDE
+3.  Go into Preferences
+4.  Add the following line as 'Additional Board Manager URL'
+
+    ```
+    https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json,https://raw.githubusercontent.com/danielkoek/nRFMicro-Arduino-Core/main/package_nRFMicro_index.json
+    ```
+
+5.  Restart the Arduino IDE
+6.  Open the Boards Manager from the Tools -> Board menu and install 'nRFMicro Boards'
+7.  Once the BSP is installed, select 'nRFMicro' or 'SuperMini nRF52840' from the Tools -> Board menu, which will update your system config to use the right compiler and settings for the nRF52.
 
 ### Optional (Core Development): BSP via git
 
- 1. Install BSP via Board Manager as above to install compiler & tools.
- 2. Delete the core folder `nrf52` installed by Board Manager in Adruino15, depending on your OS. It could be
-  * macOS  : `~/Library/Arduino15/packages/nRFMicro/hardware/nrf52`
-  * Linux  : `~/.arduino15/packages/nRFMicro/hardware/nrf52`
-  * Windows: `%APPDATA%\Local\Arduino15\packages\nRFMicro\hardware\nrf52`
- 3. `cd <SKETCHBOOK>`, where `<SKETCHBOOK>` is your Arduino Sketch folder:
-  * macOS  : `~/Documents/Arduino`
-  * Linux  : `~/Arduino`
-  * Windows: `~/Documents/Arduino`
- 4. Create a folder named `hardware/nRFMicro`, if it does not exist, and change directories to it
- 5. Clone this repo & its submodules:
+1.  Install BSP via Board Manager as above to install compiler & tools.
+2.  Delete the core folder `nrf52` installed by Board Manager in Adruino15, depending on your OS. It could be
 
-   ```
-   git clone https://github.com/pdcook/nRFMicro-Arduino-Core
-   cd nRFMicro-Arduino-Core
-   git submodule update --init
-   ```
-   
- 6. Restart the Arduino IDE
- 7. Once the BSP is installed, select 'nRFMicro' or 'SuperMini nRF52840' from the Tools -> Board menu, which will update your system config to use the right compiler and settings for the nRF52.
+- macOS : `~/Library/Arduino15/packages/nRFMicro/hardware/nrf52`
+- Linux : `~/.arduino15/packages/nRFMicro/hardware/nrf52`
+- Windows: `%APPDATA%\Local\Arduino15\packages\nRFMicro\hardware\nrf52`
+
+3.  `cd <SKETCHBOOK>`, where `<SKETCHBOOK>` is your Arduino Sketch folder:
+
+- macOS : `~/Documents/Arduino`
+- Linux : `~/Arduino`
+- Windows: `~/Documents/Arduino`
+
+4.  Create a folder named `hardware/nRFMicro`, if it does not exist, and change directories to it
+5.  Clone this repo & its submodules:
+
+```
+git clone https://github.com/pdcook/nRFMicro-Arduino-Core
+cd nRFMicro-Arduino-Core
+git submodule update --init
+```
+
+6.  Restart the Arduino IDE
+7.  Once the BSP is installed, select 'nRFMicro' or 'SuperMini nRF52840' from the Tools -> Board menu, which will update your system config to use the right compiler and settings for the nRF52.
 
 ### Adafruit's nrfutil tools
 

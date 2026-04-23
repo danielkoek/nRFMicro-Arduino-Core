@@ -29,20 +29,19 @@
     (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
     ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /**************************************************************************/
 #ifndef BLEADVERTISING_H_
 #define BLEADVERTISING_H_
 
 #include <Arduino.h>
-#include "bluefruit_common.h"
+
 #include "BLEClientService.h"
-
-#include "BLEUuid.h"
 #include "BLEService.h"
-
+#include "BLEUuid.h"
+#include "bluefruit_common.h"
 #include "services/BLEBeacon.h"
 #include "services/EddyStone.h"
 
@@ -55,27 +54,25 @@
  * longer intervals: 152.5 ms, 211.25 ms, 318.75 ms, 417.5 ms, 546.25 ms,
  * 760 ms, 852.5 ms, 1022.5 ms, 1285 ms
  */
-#define BLE_ADV_INTERVAL_FAST_DFLT       32  // 20    ms (in 0.625 ms unit)
-#define BLE_ADV_INTERVAL_SLOW_DFLT       244 // 152.5 ms (in 0.625 ms unit)
-#define BLE_ADV_FAST_TIMEOUT_DFLT        30  // in seconds
+#define BLE_ADV_INTERVAL_FAST_DFLT 32   // 20    ms (in 0.625 ms unit)
+#define BLE_ADV_INTERVAL_SLOW_DFLT 244  // 152.5 ms (in 0.625 ms unit)
+#define BLE_ADV_FAST_TIMEOUT_DFLT 30    // in seconds
 
 // forward declaration
 class BLEAdvertisingData;
 
 // Abstract Class to set Adv Data
-class Advertisable
-{
-  public:
-    virtual bool setAdv(BLEAdvertisingData& adv) = 0;
+class Advertisable {
+ public:
+  virtual bool setAdv(BLEAdvertisingData& adv) = 0;
 };
 
-class BLEAdvertisingData
-{
-protected:
+class BLEAdvertisingData {
+ protected:
   uint8_t _data[BLE_GAP_ADV_SET_DATA_SIZE_MAX];
   uint8_t _count;
 
-public:
+ public:
   BLEAdvertisingData(void);
 
   /*------------- Adv Data -------------*/
@@ -90,33 +87,35 @@ public:
   bool addUuid(BLEUuid bleuuid);
   bool addUuid(BLEUuid bleuuid1, BLEUuid bleuuid2);
   bool addUuid(BLEUuid bleuuid1, BLEUuid bleuuid2, BLEUuid bleuuid3);
-  bool addUuid(BLEUuid bleuuid1, BLEUuid bleuuid2, BLEUuid bleuuid3, BLEUuid bleuuid4);
+  bool addUuid(BLEUuid bleuuid1, BLEUuid bleuuid2, BLEUuid bleuuid3,
+               BLEUuid bleuuid4);
 
   bool addUuid(BLEUuid bleuuid[], uint8_t count);
 
   /*------------- Service -------------*/
   bool addService(BLEService& service);
   bool addService(BLEService& service1, BLEService& service2);
-  bool addService(BLEService& service1, BLEService& service2, BLEService& service3);
-  bool addService(BLEService& service1, BLEService& service2, BLEService& service3, BLEService& service4);
+  bool addService(BLEService& service1, BLEService& service2,
+                  BLEService& service3);
+  bool addService(BLEService& service1, BLEService& service2,
+                  BLEService& service3, BLEService& service4);
 
   /*------------- Client Service -------------*/
   bool addService(BLEClientService& service);
 
   // Functions to work with the raw advertising packet
-  uint8_t  count(void);
+  uint8_t count(void);
   uint8_t* getData(void);
-  bool     setData(const uint8_t* data, uint8_t count);
-  void     clearData(void);
+  bool setData(const uint8_t* data, uint8_t count);
+  void clearData(void);
 
-  bool     setData(Advertisable& adv_able) { return adv_able.setAdv(*this); }
+  bool setData(Advertisable& adv_able) { return adv_able.setAdv(*this); }
 };
 
-class BLEAdvertising : public BLEAdvertisingData
-{
-public:
-  typedef void (*stop_callback_t) (void);
-  typedef void (*slow_callback_t) (void);
+class BLEAdvertising : public BLEAdvertisingData {
+ public:
+  typedef void (*stop_callback_t)(void);
+  typedef void (*slow_callback_t)(void);
 
   BLEAdvertising(void);
 
@@ -126,7 +125,7 @@ public:
   void setSlowCallback(slow_callback_t fp);
   void setStopCallback(stop_callback_t fp);
 
-  void setInterval  (uint16_t fast, uint16_t slow);
+  void setInterval(uint16_t fast, uint16_t slow);
   void setIntervalMS(uint16_t fast, uint16_t slow);
 
   uint16_t getInterval(void);
@@ -141,7 +140,7 @@ public:
 
   void restartOnDisconnect(bool enable);
   bool start(uint16_t timeout = 0);
-  bool stop (void);
+  bool stop(void);
 
   /*------------------------------------------------------------------*/
   /* INTERNAL USAGE ONLY
@@ -150,21 +149,22 @@ public:
    *------------------------------------------------------------------*/
   void _eventHandler(ble_evt_t* evt);
 
-private:
-  uint8_t  _hdl;
-  uint8_t  _type;
-  bool     _start_if_disconnect;
-  bool     _runnning;
-  ble_gap_addr_t _peer_addr; //! Target address for an ADV_DIRECT_IND advertisement
+ private:
+  uint8_t _hdl;
+  uint8_t _type;
+  bool _start_if_disconnect;
+  bool _running;
+  ble_gap_addr_t
+      _peer_addr;  //! Target address for an ADV_DIRECT_IND advertisement
 
   uint32_t _conn_mask;
 
-  uint16_t _fast_interval;   // in 0.625 ms
-  uint16_t _slow_interval;   // in 0.625 ms
-  uint16_t _active_interval; // in 0.625 ms
+  uint16_t _fast_interval;    // in 0.625 ms
+  uint16_t _slow_interval;    // in 0.625 ms
+  uint16_t _active_interval;  // in 0.625 ms
 
-  uint16_t _fast_timeout; // in second
-  uint16_t _stop_timeout; // in second
+  uint16_t _fast_timeout;  // in second
+  uint16_t _stop_timeout;  // in second
   uint16_t _left_timeout;
 
   stop_callback_t _stop_cb;
@@ -172,7 +172,6 @@ private:
 
   // Internal function
   bool _start(uint16_t interval, uint16_t timeout);
-
 };
 
 #endif /* BLEADVERTISING_H_ */

@@ -1,0 +1,88 @@
+name: Package
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to package (e.g. 1.2.0). Defaults to version in package.json."
+        required: false
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # needed to commit the updated index and create a release
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: "true"
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ---------------------------------------------------------------
+      # Resolve the version from tag, manual input, or package.json
+      # ---------------------------------------------------------------
+      - name: Resolve version
+        id: version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+          elif [[ -n "${{ github.event.inputs.version }}" ]]; then
+            echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            VERSION=$(python3 -c "import json; print(json.load(open('package.json'))['version'])")
+            echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ---------------------------------------------------------------
+      # Build the tar.bz2 and update package_nRFMicro_index.json
+      # ---------------------------------------------------------------
+      - name: Build archive and update index
+        id: pkg
+        run: |
+          BASE_URL="https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}"
+          python3 tools/make_package.py \
+            --version   "${{ steps.version.outputs.version }}" \
+            --update-index \
+            --base-url  "$BASE_URL"
+
+      # ---------------------------------------------------------------
+      # Commit updated index back to main (tag pushes only)
+      # ---------------------------------------------------------------
+      - name: Commit updated package index
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package_nRFMicro_index.json
+          if git diff --staged --quiet; then
+            echo "package_nRFMicro_index.json unchanged – nothing to commit"
+          else
+            git commit -m "chore: update package index for v${{ steps.version.outputs.version }} [skip ci]"
+            git push origin HEAD:main
+          fi
+
+      # ---------------------------------------------------------------
+      # Always upload the archive as a workflow artifact
+      # ---------------------------------------------------------------
+      - name: Upload archive artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.pkg.outputs.archive_name }}
+          path: ${{ steps.pkg.outputs.archive_path }}
+
+      # ---------------------------------------------------------------
+      # Create a GitHub Release with the archive attached (tag only)
+      # ---------------------------------------------------------------
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: nRFMicro Arduino Core v${{ steps.version.outputs.version }}
+          files: ${{ steps.pkg.outputs.archive_path }}
+          generate_release_notes: true
